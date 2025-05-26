@@ -130,3 +130,15 @@ if premium_eth is not None:
     st.metric("프리미엄", f"{premium_eth}%")
 else:
     st.warning("프리미엄 계산 실패")
+
+st.markdown("---")
+st.subheader("🛠️ 디버깅 정보 (개발자용)")
+
+st.write("환율 (fx):", fx)
+st.write("BTC 글로벌 가격:", global_btc)
+st.write("BTC P2P 가격:", p2p_btc)
+st.write("BTC 프리미엄:", premium_btc)
+
+st.write("ETH 글로벌 가격:", global_eth)
+st.write("ETH P2P 가격:", p2p_eth)
+st.write("ETH 프리미엄:", premium_eth)
