@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from streamlit_autorefresh import st_autorefresh
 
-# --------------------- 기본 설정 ---------------------
-st.set_page_config(page_title="India Crypto Premium", layout="centered")
+# Streamlit page config
+st.set_page_config(page_title="India Crypto Premium Tracker", layout="centered")
 st_autorefresh(interval=60 * 1000, key="auto-refresh")
 
-st.title("India KIMP Tracker 💹")
-st.caption("실시간으로 인도 프리미엄 추이를 추적합니다.")
+st.title("🇮🇳 India Crypto Premium Tracker")
+st.caption("Auto-updated every 60 seconds (USDT / BTC / ETH)")
 
-# --------------------- API 요청 안정화 ---------------------
+# Safe JSON request function
 def safe_get_json(url, retries=5, delay=3):
     for _ in range(retries):
         try:
@@ -24,7 +24,7 @@ def safe_get_json(url, retries=5, delay=3):
             time.sleep(delay)
     return None
 
-# --------------------- 가격 수집 함수들 ---------------------
+# P2P price (INR) from Binance
 def get_p2p_price_inr(coin):
     url = "https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search"
     payload = {
@@ -44,6 +44,7 @@ def get_p2p_price_inr(coin):
     except:
         return None
 
+# Global price (USD) from CoinGecko (coin-by-coin)
 def get_global_price_usdt(symbol):
     symbol_map = {
         "BTC": "bitcoin",
@@ -56,6 +57,7 @@ def get_global_price_usdt(symbol):
     except:
         return None
 
+# USD/INR exchange rate
 def get_usd_inr():
     url = "https://open.er-api.com/v6/latest/USD"
     data = safe_get_json(url)
@@ -64,6 +66,7 @@ def get_usd_inr():
     except:
         return None
 
+# Premium calculation
 def calculate_premium(p2p_inr, global_usd, fx):
     if p2p_inr is not None and global_usd is not None and fx is not None:
         inr_to_usd = p2p_inr / fx
@@ -71,7 +74,7 @@ def calculate_premium(p2p_inr, global_usd, fx):
         return round(premium, 2)
     return None
 
-# --------------------- 실시간 데이터 수집 ---------------------
+# Fetch all data
 fx = get_usd_inr()
 
 p2p_usdt = get_p2p_price_inr("USDT")
@@ -86,92 +89,81 @@ p2p_eth = get_p2p_price_inr("ETH")
 global_eth = get_global_price_usdt("ETH")
 premium_eth = calculate_premium(p2p_eth, global_eth, fx)
 
-# --------------------- 세션에 프리미엄 누적 저장 ---------------------
+# Session-based storage
 if "premium_log" not in st.session_state:
     st.session_state.premium_log = []
 
 now = datetime.now().strftime("%H:%M:%S")
 if premium_usdt is not None and premium_btc is not None and premium_eth is not None:
     st.session_state.premium_log.append({
-        "시간": now,
-        "USDT 프리미엄": premium_usdt,
-        "BTC 프리미엄": premium_btc,
-        "ETH 프리미엄": premium_eth
+        "Time": now,
+        "USDT Premium": premium_usdt,
+        "BTC Premium": premium_btc,
+        "ETH Premium": premium_eth
     })
 
-# --------------------- 데이터 출력 ---------------------
-st.subheader("\ud83d\udcc0 USD/INR \ud655\uc728")
+# Display USD/INR
+st.subheader("📌 USD/INR Exchange Rate")
 if fx is not None:
     st.write(f"₹{fx}")
 else:
-    st.warning("환율 정보를 가져오지 못했습니다.")
+    st.warning("Failed to fetch exchange rate")
 
+# USDT Premium
 st.markdown("---")
-st.subheader("\ud83d\udcb5 USDT 프리미엄")
+st.subheader("💵 USDT Premium")
 if p2p_usdt is not None:
-    st.metric("P2P 가격 (INR)", f"₹{p2p_usdt}")
+    st.metric("P2P Price (INR)", f"₹{p2p_usdt}")
 else:
-    st.warning("P2P 가격 수집 실패")
-st.metric("글로벌 가격 ($)", f"${global_usdt}")
+    st.warning("Failed to fetch USDT P2P price")
+st.metric("Global Price (USD)", f"${global_usdt}")
 if premium_usdt is not None:
-    st.metric("프리미엄", f"{premium_usdt}%")
+    st.metric("Premium", f"{premium_usdt}%")
 else:
-    st.warning("프리미엄 계산 실패")
+    st.warning("USDT premium calculation failed")
 
+# BTC Premium
 st.markdown("---")
-st.subheader("\ud83d\udd38 BTC 프리미엄")
+st.subheader("🟠 BTC Premium")
 if p2p_btc is not None:
-    st.metric("P2P 가격 (INR)", f"₹{p2p_btc:,.0f}")
+    st.metric("P2P Price (INR)", f"₹{p2p_btc:,.0f}")
 else:
-    st.warning("P2P 가격 수집 실패")
+    st.warning("Failed to fetch BTC P2P price")
 if global_btc is not None:
-    st.metric("글로벌 가격 ($)", f"${global_btc:,.0f}")
+    st.metric("Global Price (USD)", f"${global_btc:,.0f}")
 else:
-    st.warning("글로벌 시세 수집 실패")
+    st.warning("Failed to fetch BTC global price")
 if premium_btc is not None:
-    st.metric("프리미엄", f"{premium_btc}%")
+    st.metric("Premium", f"{premium_btc}%")
 else:
-    st.warning("프리미엄 계산 실패")
+    st.warning("BTC premium calculation failed")
 
+# ETH Premium
 st.markdown("---")
-st.subheader("\ud83d\udd39 ETH 프리미엄")
+st.subheader("🟣 ETH Premium")
 if p2p_eth is not None:
-    st.metric("P2P 가격 (INR)", f"₹{p2p_eth:,.0f}")
+    st.metric("P2P Price (INR)", f"₹{p2p_eth:,.0f}")
 else:
-    st.warning("P2P 가격 수집 실패")
+    st.warning("Failed to fetch ETH P2P price")
 if global_eth is not None:
-    st.metric("글로벌 가격 ($)", f"${global_eth:,.0f}")
+    st.metric("Global Price (USD)", f"${global_eth:,.0f}")
 else:
-    st.warning("글로벌 시세 수집 실패")
+    st.warning("Failed to fetch ETH global price")
 if premium_eth is not None:
-    st.metric("프리미엄", f"{premium_eth}%")
+    st.metric("Premium", f"{premium_eth}%")
 else:
-    st.warning("프리미엄 계산 실패")
+    st.warning("ETH premium calculation failed")
 
-# --------------------- 프리미엄 변화 그래프 ---------------------
+# Graph
 if st.session_state.premium_log:
     df = pd.DataFrame(st.session_state.premium_log)
-
     st.markdown("---")
-    st.subheader("\ud83d\udcca \uc2e4\uc2dc\uac04 \ud504\ub9ac\ubbf8\uc5c4 \ubcc0\ud654 \ucd94\uc774")
-
+    st.subheader("📈 Real-Time Premium Trend")
     plt.figure(figsize=(10, 4))
-    plt.plot(df["시간"], df["BTC 프리미엄"], label="BTC", marker='o')
-    plt.plot(df["시간"], df["ETH 프리미엄"], label="ETH", marker='o')
-    plt.plot(df["시간"], df["USDT 프리미엄"], label="USDT", marker='o')
+    plt.plot(df["Time"], df["BTC Premium"], label="BTC", marker='o')
+    plt.plot(df["Time"], df["ETH Premium"], label="ETH", marker='o')
+    plt.plot(df["Time"], df["USDT Premium"], label="USDT", marker='o')
     plt.legend()
     plt.xticks(rotation=45)
     plt.title("Premium Trend")
-    plt.xlabel("time")
     st.pyplot(plt)
-
-# --------------------- 디버깅 ---------------------
-st.markdown("---")
-st.subheader("\ud83d\udd27 \ub514\ubc84\uae45 \uc815\ubcf4 (\uac1c\ubc1c\uc790\uc6a9)")
-st.write("환율 (fx):", fx)
-st.write("BTC 글로벌 가격:", global_btc)
-st.write("BTC P2P 가격:", p2p_btc)
-st.write("BTC 프리미엄:", premium_btc)
-st.write("ETH 글로벌 가격:", global_eth)
-st.write("ETH P2P 가격:", p2p_eth)
-st.write("ETH 프리미엄:", premium_eth)
