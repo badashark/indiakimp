@@ -161,8 +161,9 @@ if st.session_state.premium_log:
     plt.plot(df["시간"], df["USDT 프리미엄"], label="USDT", marker='o')
     plt.legend()
     plt.xticks(rotation=45)
-    plt.title("프리미엄 추이")
-    st.pyplot(plt)
+    plt.title("Premium Trend")
+    plt.xlabel("time")
+        st.pyplot(plt)
 
 # --------------------- 디버깅 ---------------------
 st.markdown("---")
