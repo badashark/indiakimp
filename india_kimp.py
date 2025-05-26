@@ -157,22 +157,27 @@ else:
 if st.session_state.premium_log:
     df = pd.DataFrame(st.session_state.premium_log)
 
-    # 🔧 보정: 문자열일 경우 datetime으로 변환
+    # Convert time column to datetime
     df["Time"] = pd.to_datetime(df["Time"])
 
     expected_cols = {"Time", "USDT Premium", "BTC Premium", "ETH Premium"}
     if expected_cols.issubset(set(df.columns)):
-        st.markdown("---")
-        st.subheader("📈 Real-Time Premium Trend")
+        
+        # ✅ 3개 이상일 때만 그래프 출력
+        if len(df) >= 3:
+            st.markdown("---")
+            st.subheader("📈 Real-Time Premium Trend")
 
-        plt.figure(figsize=(10, 4))
-        plt.plot(df["Time"], df["BTC Premium"], label="BTC", marker='o')
-        plt.plot(df["Time"], df["ETH Premium"], label="ETH", marker='o')
-        plt.plot(df["Time"], df["USDT Premium"], label="USDT", marker='o')
-        plt.legend()
-        plt.xticks(rotation=45)
-        plt.title("Premium Trend")
-        st.pyplot(plt)
+            plt.figure(figsize=(10, 4))
+            plt.plot(df["Time"], df["BTC Premium"], label="BTC", marker='o')
+            plt.plot(df["Time"], df["ETH Premium"], label="ETH", marker='o')
+            plt.plot(df["Time"], df["USDT Premium"], label="USDT", marker='o')
+            plt.legend()
+            plt.xticks(rotation=45)
+            plt.title("Premium Trend")
+            st.pyplot(plt)
+        else:
+            st.info(f"⏳ Waiting for more data... ({len(df)}/3 points collected)")
     else:
         st.warning("⛔ Data columns are not ready yet.")
 
