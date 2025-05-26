@@ -154,11 +154,12 @@ if premium_eth is not None:
 else:
     st.warning("ETH premium calculation failed")
 
-# Graph
 if st.session_state.premium_log:
     df = pd.DataFrame(st.session_state.premium_log)
 
-    # ✅ 필요한 컬럼이 다 있는지 확인
+    # 🔧 보정: 문자열일 경우 datetime으로 변환
+    df["Time"] = pd.to_datetime(df["Time"])
+
     expected_cols = {"Time", "USDT Premium", "BTC Premium", "ETH Premium"}
     if expected_cols.issubset(set(df.columns)):
         st.markdown("---")
