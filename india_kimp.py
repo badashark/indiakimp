@@ -37,15 +37,10 @@ def get_global_price_usdt(symbol):
     try:
         url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
         response = requests.get(url).json()
-
-        coin_data = response.get(symbol_map[symbol])
-        if coin_data and "usd" in coin_data:
-            return float(coin_data["usd"])
-        else:
-            return None
-    except Exception as e:
-        print("🔴 글로벌 시세 수집 실패:", e)
+        return float(response[symbol_map[symbol]]["usd"])
+    except:
         return None
+
 # ✅ 환율 수집 함수
 def get_usd_inr():
     try:
