@@ -47,13 +47,10 @@ def get_global_price_usdt(symbol):
         "BTC": "bitcoin",
         "ETH": "ethereum"
     }
-    url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
-    data = safe_get_json(url)
     try:
-        coin_data = data.get(symbol_map[symbol])
-        if coin_data and "usd" in coin_data:
-            return float(coin_data["usd"])
-        return None
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={symbol_map[symbol]}&vs_currencies=usd"
+        data = safe_get_json(url)
+        return float(data[symbol_map[symbol]]["usd"])
     except:
         return None
 
