@@ -29,17 +29,15 @@ def get_p2p_price_inr(coin):
     except:
         return None
 
-# ✅ CoinGecko를 통한 글로벌 시세 수집 함수
 def get_global_price_usdt(symbol):
     symbol_map = {
         "BTC": "bitcoin",
-        "ETH": "ethereum",
-        "USDT": "tether"
+        "ETH": "ethereum"
     }
     try:
-        url = f"https://api.coinstats.app/public/v1/coins/{symbol_map[symbol]}"
+        url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd"
         response = requests.get(url).json()
-        return float(response['coin']['price'])
+        return float(response[symbol_map[symbol]]["usd"])
     except:
         return None
 
