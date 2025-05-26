@@ -36,12 +36,10 @@ def get_global_price_usdt(symbol):
         "ETH": "ethereum",
         "USDT": "tether"
     }
-    if symbol not in symbol_map:
-        return None
     try:
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids={symbol_map[symbol]}&vs_currencies=usd"
+        url = f"https://api.coinstats.app/public/v1/coins/{symbol_map[symbol]}"
         response = requests.get(url).json()
-        return float(response[symbol_map[symbol]]["usd"])
+        return float(response['coin']['price'])
     except:
         return None
 
