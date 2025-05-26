@@ -163,7 +163,7 @@ if st.session_state.premium_log:
     plt.xticks(rotation=45)
     plt.title("Premium Trend")
     plt.xlabel("time")
-        st.pyplot(plt)
+    st.pyplot(plt)
 
 # --------------------- 디버깅 ---------------------
 st.markdown("---")
