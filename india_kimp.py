@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 from streamlit_autorefresh import st_autorefresh
 
-st_autorefresh(interval=60 * 1000, key="auto-refresh")
 st.set_page_config(page_title="India Crypto Premium", layout="centered")
+st_autorefresh(interval=60 * 1000, key="auto-refresh")
 st.title("🇮🇳 인도 코인 프리미엄 실시간 트래커")
 st.caption("⏱️ 60초마다 자동 갱신됩니다.")
 
