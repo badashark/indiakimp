@@ -157,13 +157,28 @@ else:
 # Graph
 if st.session_state.premium_log:
     df = pd.DataFrame(st.session_state.premium_log)
-    st.markdown("---")
-    st.subheader("📈 Real-Time Premium Trend")
-    plt.figure(figsize=(10, 4))
-    plt.plot(df["Time"], df["BTC Premium"], label="BTC", marker='o')
-    plt.plot(df["Time"], df["ETH Premium"], label="ETH", marker='o')
-    plt.plot(df["Time"], df["USDT Premium"], label="USDT", marker='o')
-    plt.legend()
-    plt.xticks(rotation=45)
-    plt.title("Premium Trend")
-    st.pyplot(plt)
+
+    # ✅ 필요한 컬럼이 다 있는지 확인
+    expected_cols = {"Time", "USDT Premium", "BTC Premium", "ETH Premium"}
+    if expected_cols.issubset(set(df.columns)):
+        st.markdown("---")
+        st.subheader("📈 Real-Time Premium Trend")
+
+        plt.figure(figsize=(10, 4))
+        plt.plot(df["Time"], df["BTC Premium"], label="BTC", marker='o')
+        plt.plot(df["Time"], df["ETH Premium"], label="ETH", marker='o')
+        plt.plot(df["Time"], df["USDT Premium"], label="USDT", marker='o')
+        plt.legend()
+        plt.xticks(rotation=45)
+        plt.title("Premium Trend")
+        st.pyplot(plt)
+    else:
+        st.warning("⛔ Data columns are not ready yet.")
+
+if premium_usdt is not None and premium_btc is not None and premium_eth is not None:
+    st.session_state.premium_log.append({
+        "Time": now,
+        "USDT Premium": premium_usdt,
+        "BTC Premium": premium_btc,
+        "ETH Premium": premium_eth
+    })
